@@ -82,8 +82,7 @@ done
 
 
 # Creates the submition script
-rm -f ${SCRIPTS}/sub_py.bash
-mkdir -p ${DATAOUT}/logs
+rm -f ${SCRIPTS}/sub_py.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.*
 cat << EOSH > ${SCRIPTS}/sub_py.bash
 #!/bin/bash
 #SBATCH --job-name=${PRODS_jobname}
@@ -92,8 +91,8 @@ cat << EOSH > ${SCRIPTS}/sub_py.bash
 #SBATCH --tasks-per-node=${PRODS_ncpn}
 #SBATCH --ntasks=${PRODS_ncores}
 #SBATCH --time=${PRODS_walltime}
-#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.o%j    # File name for standard output
-#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.e%j     # File name for standard error output
+#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.o    # File name for standard output
+#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.e     # File name for standard error output
 #SBATCH --exclusive
 
 
