@@ -19,14 +19,11 @@ module load python-3.9.13-gcc-9.4.0-moxjnc6
 module load ecflow/5.8.4
 module list
 
-#python -m venv .venv 
-#source .venv/bin/activate
-#pip install -r requirements.txt 
-#set +e
-#unalias python
-#set -e
-#echo "sentev >>> $(pwd)"
-#source .venv/bin/activate
+echo "sentev >>> $(pwd)"
+python -m venv .venv 
+source .venv/bin/activate
+pip install -r requirements.txt 
+source .venv/bin/activate
 
 # MONAN-suite install root directories:
 # Put your directories:
@@ -40,7 +37,7 @@ export PRODS_QUEUE="batch"
 export PRODS_ncores=1
 export PRODS_nnodes=1
 export PRODS_ncpn=1
-export PRODS_jobname="Prod.py.MONAN"
+export PRODS_jobname="Prods.MONAN"
 export PRODS_walltime="8:00:00"
 
 

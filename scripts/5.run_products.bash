@@ -32,7 +32,7 @@ then
    echo "${0} GFS 1024002 2024010100 24"
    echo ""
 
-   #exit
+   exit
 fi
 
 # Set environment variables exports:
@@ -44,7 +44,7 @@ echo -e "\033[1;32m==>\033[0m Moduling environment for MONAN model...\n"
 # Standart directories variables:---------------------------------------
 DIRHOMES=${DIR_PRODUCTS};     #mkdir -p ${DIRHOMES}  
 DIRHOMED=${DIR_PRODUCTD};     #mkdir -p ${DIRHOMED}  
-SCRIPTS=${DIRHOMES}/scripts;  mkdir -p ${SCRIPTS}
+SCRIPTS=${DIRHOMES}/scripts;  #mkdir -p ${SCRIPTS}
 DATAIN=${DIRHOMED}/datain;    #mkdir -p ${DATAIN}
 DATAOUT=${DIRHOMED}/dataout;  mkdir -p ${DATAOUT}
 SOURCES=${DIRHOMES}/sources;  #mkdir -p ${SOURCES}
@@ -62,12 +62,13 @@ FCST=${4};        #FCST=6
 
 
 # Local variables--------------------------------------
+DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
 
 
 # Check all input files before
-files_needed=("/mnt/beegfs/monan/scripts_CD-CT/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
+files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
 for file in "${files_needed[@]}"
 do
   if [ ! -s "${file}" ]
@@ -116,9 +117,9 @@ export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export I_MPI_DEBUG=5
 
-# The arguments are:
+# The python gera_figs.py arguments are:
 # 
-# --basedir - Base directory                 :: default='/mnt/beegfs/monan/scripts_CD-CT/dataout/'
+# --basedir - Base directory (input)         :: default='/mnt/beegfs/monan/scripts_CD-CT/dataout/'
 # --datein  - Date to be processed           :: default=makedate(date.today())
 # --suffix  - suffix of file in              :: default='.00.00.x1024002L55'
 # --prefix  - prefix of file in              :: default='MONAN_DIAG_G_POS_GFS_'
@@ -127,10 +128,8 @@ export I_MPI_DEBUG=5
 # --mxhour  - Total of hours to be processed :: default=120
 # 
 #
-# just for testing in my count on branch while desenv:
 
-
-echo "python ${SCRIPTS}/gera_figs.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}"
+python ${SCRIPTS}/gera_figs.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
 EOSH
 # Submit the products scripts
 chmod a+x ${SCRIPTS}/sub_py.bash

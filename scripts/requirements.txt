@@ -1,0 +1,9 @@
+argparse
+basemap==1.4.1
+DateTime==5.5
+matplotlib==3.8.4
+netCDF4==1.6.5
+numpy==1.26.4
+pyparsing==3.1.2
+xarray==2024.5.0
+
