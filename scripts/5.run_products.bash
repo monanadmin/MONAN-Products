@@ -40,6 +40,9 @@ echo ""
 echo -e "\033[1;32m==>\033[0m Moduling environment for MONAN model...\n"
 . setenv.bash
 
+# TODO - execute install outside here , just when needed, for example
+# when a new Python library would be included
+. 1.install.bash
 
 # Standart directories variables:---------------------------------------
 DIRHOMES=${DIR_PRODUCTS};     #mkdir -p ${DIRHOMES}  

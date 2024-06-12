@@ -20,9 +20,6 @@ module load ecflow/5.8.4
 module list
 
 echo "sentev >>> $(pwd)"
-python -m venv .venv 
-source .venv/bin/activate
-pip install -r requirements.txt 
 source .venv/bin/activate
 
 # MONAN-suite install root directories:

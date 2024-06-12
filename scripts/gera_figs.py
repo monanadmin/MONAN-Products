@@ -48,6 +48,8 @@ def clean():
 def get_new_levels(levels, vmin, vmax):
 
     levels = np.asarray(levels)
+    # because levels could be initialized with integers, it convert to integer when inserting
+    levels = levels.astype(float)
 
     # Adjust levels to include vmin and vmax if necessary
     if vmin < levels[0]:
@@ -80,19 +82,20 @@ def plotInFixLev(step,m,minv,maxv,levels,var,unit,tit1,tit2,newdate,figname,outp
 
 def plotInLev(lev,step,m,minv,maxv,levels,var,unit,tit1,tit2,newdate,figname,output_dir,prefix,date_in,sufix):
     # This functin generate the figure for fields in a pressure levels (e.g. temperature, relhum)
-    #Ajusta os valores máximos e mínimos da escala
+    # Ajusta os valores máximos e mínimos da escala
     vmin=minv
     vmax=maxv
+    print('vmin', vmin, 'vmax', vmax)
     levels = get_new_levels(levels, vmin, vmax)
-    #Cria os ranges de valores da escala a ser plotada (clevs)
+    # Cria os ranges de valores da escala a ser plotada (clevs)
     cs = m.contourf(x, y, var[step,lev,:,:], levels = levels, cmap='jet', vmin=vmin, vmax =vmax)
-    #cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
+    # cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
     plt.colorbar(cs, orientation='horizontal', label=unit, pad=0.05, aspect=50)
     title = "MONAN - {0} at level {1} hPa for {2}".format(tit1,tit2,newdate)
     plt.title(title)
     date_out = newdate.strftime("%Y%m%d%H")
     figOutname = "{0}{1}_{2}{3}_{4}{5}.png".format(output_dir,figname,prefix,date_in,date_out,sufix)
-    #print(figOutname)
+    # print(figOutname)
     plt.savefig(figOutname, dpi=300, format='png', transparent=True, bbox_inches='tight')
 
     clean()
