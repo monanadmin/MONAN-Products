@@ -69,7 +69,7 @@ def plotInFixLev(step,m,minv,maxv,levels,var,unit,tit1,tit2,newdate,figname,outp
     cs = m.contourf(x, y, var[step,:,:], levels = levels, cmap='jet', vmin=vmin, vmax =vmax)
     #cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
     plt.colorbar(cs, orientation='horizontal', label=unit, pad=0.05, aspect=50)
-    title = "MONAN - {0} at level {1} for {2}".format(tit1,tit2,newdate)
+    title = "MONAN_{3} - {0} at level {1} for {2}".format(tit1,tit2,newdate,version)
     plt.title(title)
     date_out = newdate.strftime("%Y%m%d%H")
     figOutname = "{0}{1}_{2}{3}_{4}{5}.png".format(output_dir,figname,prefix,date_in,date_out,sufix)
@@ -91,7 +91,7 @@ def plotInLev(lev,step,m,minv,maxv,levels,var,unit,tit1,tit2,newdate,figname,out
     cs = m.contourf(x, y, var[step,lev,:,:], levels = levels, cmap='jet', vmin=vmin, vmax =vmax)
     # cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
     plt.colorbar(cs, orientation='horizontal', label=unit, pad=0.05, aspect=50)
-    title = "MONAN - {0} at level {1} hPa for {2}".format(tit1,tit2,newdate)
+    title = "MONAN_{3}- {0} at level {1} hPa for {2}".format(tit1,tit2,newdate,version)
     plt.title(title)
     date_out = newdate.strftime("%Y%m%d%H")
     figOutname = "{0}{1}_{2}{3}_{4}{5}.png".format(output_dir,figname,prefix,date_in,date_out,sufix)
@@ -111,7 +111,7 @@ def plotWindInFixLev(step,m,minv,maxv,levels,varu,varv,unit,tit1,tit2,newdate,fi
     cs = m.contourf(x, y, speed[:,:], levels = levels, cmap='jet', vmin=vmin, vmax =vmax)
     #cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
     plt.colorbar(cs, orientation='horizontal', label=unit, pad=0.05, aspect=50)    
-    title = "MONAN - {0} at level {1} for {2}".format(tit1,tit2,newdate)
+    title = "MONAN_{3} - {0} at level {1} for {2}".format(tit1,tit2,newdate,version)
     plt.title(title)
     date_out = newdate.strftime("%Y%m%d%H")
     figOutname = "{0}{1}_{2}{3}_{4}{5}.png".format(output_dir,figname,prefix,date_in,date_out,sufix)
@@ -131,7 +131,7 @@ def plotWindInLev(lev,step,m,minv,maxv,levels,varu,varv,unit,tit1,tit2,newdate,f
     cs = m.contourf(x, y, speed[:,:], levels = levels, cmap='jet', vmin=vmin, vmax =vmax)
     #cs = m.quiver(x, y, vu[0,:,:], vv[0,:,:], color='Teal', angles='xy', scale=100, headlength=7)
     plt.colorbar(cs, orientation='horizontal', label=unit, pad=0.05, aspect=50)
-    title = "MONAN - {0} at level {1} hPa for {2}".format(tit1,tit2,newdate)
+    title = "MONAN_{3} - {0} at level {1} hPa for {2}".format(tit1,tit2,newdate,version)
     plt.title(title)
     date_out = newdate.strftime("%Y%m%d%H")
     figOutname = "{0}{1}_{2}{3}_{4}{5}.png".format(output_dir,figname,prefix,date_in,date_out,sufix)
@@ -180,6 +180,12 @@ print("Processing ",nsteps," outputs from ",date_in," in steps of ",tstep," h" )
 
 #Create the name of input file ands open dataset
 file_input = "{0}/{1}/Post/{2}{1}{3}.nc".format(base_input_dir,date_in,prefix,sufix)
+file_version = "{0}/{1}/Post/VERSION.txt".format(base_input_dir,date_in)
+try:
+    file_ver_p = open(file_version, 'r')
+    version=file_ver_p.read().strip()
+except Exception as e:
+    print('Error reading VERSION.txt', e)
 
 start_time = time.time()
 print("Getting variables, please wait! This will take a while...")
