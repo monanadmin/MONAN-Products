@@ -185,7 +185,8 @@ try:
     file_ver_p = open(file_version, 'r')
     version=file_ver_p.read().strip()
 except Exception as e:
-    print('Error reading VERSION.txt', e)
+    version=''
+    print('VERSION.txt not is Post directory', e)
 
 start_time = time.time()
 print("Getting variables, please wait! This will take a while...")
