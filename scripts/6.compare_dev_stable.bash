@@ -62,34 +62,34 @@ FCST=${4};        #FCST=6
 
 
 # Local variables--------------------------------------
-#DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
-#DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/monan/scripts_CD-CT_dev/scripts_CD-CT
-DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/$USER/issues/534/MONAN-Products/
-DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/$USER/issues/534/MONAN-Products/
+DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
+DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/monan/scripts_CD-CT_dev/scripts_CD-CT
+#DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/$USER/issues/534/MONAN-Products/
+#DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/$USER/issues/534/MONAN-Products/
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
 
 
-## Check all input files before
-#files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc" "${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
-#for file in "${files_needed[@]}"
-#do
-#  if [ ! -s "${file}" ]
-#  then
-#    echo -e  "\n${RED}==>${NC} ***** ATTENTION *****\n"	  
-#    echo -e  "${RED}==>${NC} [${0}] At least the file ${file} was not generated. \n"
-#    exit -1
-#  fi
-#done
+# Check all input files before
+files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc" "${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
+for file in "${files_needed[@]}"
+do
+  if [ ! -s "${file}" ]
+  then
+    echo -e  "\n${RED}==>${NC} ***** ATTENTION *****\n"	  
+    echo -e  "${RED}==>${NC} [${0}] At least the file ${file} was not generated. \n"
+    exit -1
+  fi
+done
 
 dir=$(pwd)
-filename=MONAN_DIAG_G_POS_GFS_2024020100.00.00.x1024002L55.nc
-#filename=MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc
-#dir1=${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/$filename
-#dir2=${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/$filename
-dir1=$dir/../dataout/2024020100/Post_0.6.0/$filename
-dir2=$dir/../dataout/2024020100/Post_1.0.0.GF.new/$filename
-dirout=$dir/GF_0.6.0xGF_1.0.0
+#filename=MONAN_DIAG_G_POS_GFS_2024020100.00.00.x1024002L55.nc
+#dir1=$dir/../dataout/2024020100/Post_0.6.0/$filename
+#dir2=$dir/../dataout/2024020100/Post_1.0.0.GF.new/$filename
+filename=MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc
+dir1=${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/$filename
+dir2=${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/$filename
+dirout=$dir/dataout
 
 executable=compare_netcdf.py
 
@@ -106,10 +106,10 @@ cat << EOSH > ${SCRIPTS}/diff_py.bash
 #SBATCH --tasks-per-node=${PRODS_ncpn}
 #SBATCH --ntasks=${PRODS_ncores}
 #SBATCH --time=${PRODS_walltime}
-###SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.o    # File name for standard output
-###SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.e     # File name for standard error output
-#SBATCH --output=$dir/my_job_diff.o%j   # File name for standard output
-#SBATCH --error=$dir/my_job_diff.e%j    # File name for standard error output
+#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.o    # File name for standard output
+#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.e     # File name for standard error output
+###SBATCH --output=$dir/my_job_diff.o%j   # File name for standard output
+###SBATCH --error=$dir/my_job_diff.e%j    # File name for standard error output
 #SBATCH --exclusive
 ###SBATCH --mem=500000
 
@@ -149,14 +149,10 @@ echo "./compare_netcdf_or_grib.py -f1 $dir1 -f2 $dir2 -o $dirout --plot"
 #./$executable -f1 $dir1 -f2 $dir2 -o $dirout --plot
 ./$executable -n1 $dir1 -n2 $dir2 -p -o $dirout
 
-
-#python ${SCRIPTS}/gera_figs.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
-
 EOSH
 
 # Submit the products scripts
 chmod a+x ${SCRIPTS}/diff_py.bash
-exit
 cp -f ${SCRIPTS}/diff_py.bash ${SCRIPTS}/$dirout
 sbatch --wait ${SCRIPTS}/diff_py.bash
 
