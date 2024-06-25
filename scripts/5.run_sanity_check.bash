@@ -40,6 +40,9 @@ echo ""
 echo -e "\033[1;32m==>\033[0m Moduling environment for MONAN model...\n"
 . setenv.bash
 
+# TODO - execute install outside here , just when needed, for example
+# when a new Python library would be included
+#. 1.install.bash
 
 # Standart directories variables:---------------------------------------
 DIRHOMES=${DIR_PRODUCTS};     #mkdir -p ${DIRHOMES}  
@@ -56,22 +59,19 @@ EXECS=${DIRHOMED}/execs;      #mkdir -p ${EXECS}
 # Input variables:--------------------------------------
 EXP=${1};         #EXP=GFS
 RES=${2};         #RES=1024002
-YYYYMMDDHHi=${3}; #YYYYMMDDHHi=2024012000
+YYYYMMDDHHi=${3}; #YYYYMMDDHHi=2024062400
 FCST=${4};        #FCST=6
 #-------------------------------------------------------
 
 
 # Local variables--------------------------------------
 DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
-DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/monan/scripts_CD-CT_dev/scripts_CD-CT
-#DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/$USER/issues/534/MONAN-Products/
-#DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/$USER/issues/534/MONAN-Products/
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
 
 
 # Check all input files before
-files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc" "${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
+files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
 for file in "${files_needed[@]}"
 do
   if [ ! -s "${file}" ]
@@ -82,23 +82,11 @@ do
   fi
 done
 
-dir=$(pwd)
-#filename=MONAN_DIAG_G_POS_GFS_2024020100.00.00.x1024002L55.nc
-#dir1=$dir/../dataout/2024020100/Post_0.6.0/$filename
-#dir2=$dir/../dataout/2024020100/Post_1.0.0.GF.new/$filename
-filename=MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc
-dir1=${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/$filename
-dir2=${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/$filename
-dirout=$dir/dataout
 
-executable=compare_netcdf.py
-
-cd ${SCRIPTS}
-mkdir -p $dirout
 
 # Creates the submition script
-rm -f ${SCRIPTS}/diff_py.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.*
-cat << EOSH > ${SCRIPTS}/diff_py.bash
+rm -f ${SCRIPTS}/sub_sanity_check.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/sub*
+cat << EOSH > ${SCRIPTS}/sub_sanity_check.bash
 #!/bin/bash
 #SBATCH --job-name=${PRODS_jobname}
 #SBATCH --nodes=${PRODS_nnodes}
@@ -106,12 +94,10 @@ cat << EOSH > ${SCRIPTS}/diff_py.bash
 #SBATCH --tasks-per-node=${PRODS_ncpn}
 #SBATCH --ntasks=${PRODS_ncores}
 #SBATCH --time=${PRODS_walltime}
-#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.o    # File name for standard output
-#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.e     # File name for standard error output
-###SBATCH --output=$dir/my_job_diff.o%j   # File name for standard output
-###SBATCH --error=$dir/my_job_diff.e%j    # File name for standard error output
-#SBATCH --exclusive
-###SBATCH --mem=500000
+#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.o    # File name for standard output
+#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.e     # File name for standard error output
+#SABTCH --exclusive
+
 
 # Set environment variables exports:
 echo ""
@@ -126,7 +112,6 @@ echo "Lista de módulos carregados: "
 module list
 echo "========"
 
-export LC_ALL='en_US.utf8'
 
 ulimit -s unlimited
 MPI_PARAMS="-iface ib0 -bind-to core -map-by core"
@@ -134,25 +119,27 @@ export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export I_MPI_DEBUG=5
 
-# The python compare_netcdf.py arguments are:
+# The python gera_figs.py arguments are:
 # 
-#--version, -v  : display version info.
-#--usage,   -h  : display this usage messsage
-#--netcdf1, -n1 : pass in name of 1-band Geotiff holding 1-band panchromatic Geotiff image (high resolution, required)
-#--netcdf2, -n2 : pass in name of 3 or 4 band multispectral Geotiff image file (low-resolution, required)
-#--plot   , -p  : create output PNG plots for each variable (one plot for variable from first NetCDF1, one from second, then a plot differences)
-#--outdir , -o  : output directory (required!)
+# --basedir - Base directory (input)         :: default='/mnt/beegfs/monan/scripts_CD-CT/dataout/'
+# --datein  - Date to be processed           :: default=makedate(date.today())
+# --suffix  - suffix of file in              :: default='.00.00.x1024002L55'
+# --prefix  - prefix of file in              :: default='MONAN_DIAG_G_POS_GFS_'
+# --outdir  - Output directory for figures   :: default='/mnt/beegfs/monan/scripts_CD-CT/dataout/'
+# --tsteps  - Time in hours between outputs  :: default=3
+# --mxhour  - Total of hours to be processed :: default=120
 # 
 #
 
-echo "./compare_netcdf_or_grib.py -f1 $dir1 -f2 $dir2 -o $dirout --plot"
-#./$executable -f1 $dir1 -f2 $dir2 -o $dirout --plot
-./$executable -n1 $dir1 -n2 $dir2 -p -o $dirout
-
+python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour 1
 EOSH
-
 # Submit the products scripts
-chmod a+x ${SCRIPTS}/diff_py.bash
-cp -f ${SCRIPTS}/diff_py.bash ${SCRIPTS}/$dirout
-sbatch --wait ${SCRIPTS}/diff_py.bash
+chmod a+x ${SCRIPTS}/sub_sanity_check.bash
+sbatch --wait ${SCRIPTS}/sub_sanity_check.bash
+
+
+
+
+
+
 
