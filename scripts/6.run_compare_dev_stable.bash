@@ -66,6 +66,7 @@ DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
 DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/monan/scripts_CD-CT_dev/scripts_CD-CT
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
+mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/compare
 
 
 # Check all input files before
@@ -80,10 +81,6 @@ do
   fi
 done
 
-dir=$(pwd)
-#filename=MONAN_DIAG_G_POS_GFS_2024020100.00.00.x1024002L55.nc
-#dir1=$dir/../dataout/2024020100/Post_0.6.0/$filename
-#dir2=$dir/../dataout/2024020100/Post_1.0.0.GF.new/$filename
 filename=MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc
 file_stable=${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/$filename
 file_dev=${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/$filename
@@ -93,8 +90,8 @@ executable=compare_netcdf.py
 cd ${SCRIPTS}
 
 # Creates the submition script
-rm -f ${SCRIPTS}/diff_py.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.*
-cat << EOSH > ${SCRIPTS}/diff_py.bash
+rm -f ${SCRIPTS}/sub_compare_dev_stable.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/diffpy.bash.*
+cat << EOSH > ${SCRIPTS}/sub_compare_dev_stable.bash
 #!/bin/bash
 #SBATCH --job-name=${PRODS6_jobname}
 #SBATCH --nodes=${PRODS6_nnodes}
@@ -139,13 +136,13 @@ export I_MPI_DEBUG=5
 #
 
 echo "./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}"
-./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}
+./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}/${YYYYMMDDHHi}/compare
 
 
 EOSH
 
 # Submit the products scripts
-chmod a+x ${SCRIPTS}/diff_py.bash
-cp -f ${SCRIPTS}/diff_py.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
-sbatch --wait ${SCRIPTS}/diff_py.bash
+chmod a+x ${SCRIPTS}/sub_compare_dev_stable.bash
+sbatch --wait ${SCRIPTS}/sub_compare_dev_stable.bash
+mv ${SCRIPTS}/sub_compare_dev_stable.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
 

@@ -96,7 +96,7 @@ cat << EOSH > ${SCRIPTS}/sub_sanity_check.bash
 #SBATCH --time=${PRODS_walltime}
 #SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.o    # File name for standard output
 #SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.e     # File name for standard error output
-#SABTCH --exclusive
+#SBATCH --exclusive
 
 
 # Set environment variables exports:
@@ -131,11 +131,12 @@ export I_MPI_DEBUG=5
 # 
 #
 
-python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour 1
+python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
 EOSH
 # Submit the products scripts
 chmod a+x ${SCRIPTS}/sub_sanity_check.bash
 sbatch --wait ${SCRIPTS}/sub_sanity_check.bash
+mv ${SCRIPTS}/sub_sanity_check.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
 
 
 

@@ -34,16 +34,16 @@ export PRODS_QUEUE="batch"
 export PRODS_ncores=1
 export PRODS_nnodes=1
 export PRODS_ncpn=1
-export PRODS_jobname="sanity.Check"
+export PRODS_jobname="Sanity.Check"
 export PRODS_walltime="8:00:00"
 
 # Compare Dev Stable phase:
-export PRODS6_QUEUE="proc"
+export PRODS6_QUEUE="batch"
 export PRODS6_ncores=1
 export PRODS6_nnodes=1
 export PRODS6_ncpn=1
 export PRODS6_jobname="Compare.Stable"
-export PRODS6_walltime="4:00:00"
+export PRODS6_walltime="8:00:00"
 
 #-----------------------------------------------------------------------
 # We discourage changing the variables below:
