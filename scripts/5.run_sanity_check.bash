@@ -42,7 +42,7 @@ echo -e "\033[1;32m==>\033[0m Moduling environment for MONAN model...\n"
 
 # TODO - execute install outside here , just when needed, for example
 # when a new Python library would be included
-. 1.install.bash
+#. 1.install.bash
 
 # Standart directories variables:---------------------------------------
 DIRHOMES=${DIR_PRODUCTS};     #mkdir -p ${DIRHOMES}  
@@ -59,7 +59,7 @@ EXECS=${DIRHOMED}/execs;      #mkdir -p ${EXECS}
 # Input variables:--------------------------------------
 EXP=${1};         #EXP=GFS
 RES=${2};         #RES=1024002
-YYYYMMDDHHi=${3}; #YYYYMMDDHHi=2024012000
+YYYYMMDDHHi=${3}; #YYYYMMDDHHi=2024062400
 FCST=${4};        #FCST=6
 #-------------------------------------------------------
 
@@ -85,8 +85,8 @@ done
 
 
 # Creates the submition script
-rm -f ${SCRIPTS}/sub_py.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.*
-cat << EOSH > ${SCRIPTS}/sub_py.bash
+rm -f ${SCRIPTS}/sub_sanity_check.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/sub*
+cat << EOSH > ${SCRIPTS}/sub_sanity_check.bash
 #!/bin/bash
 #SBATCH --job-name=${PRODS_jobname}
 #SBATCH --nodes=${PRODS_nnodes}
@@ -94,8 +94,8 @@ cat << EOSH > ${SCRIPTS}/sub_py.bash
 #SBATCH --tasks-per-node=${PRODS_ncpn}
 #SBATCH --ntasks=${PRODS_ncores}
 #SBATCH --time=${PRODS_walltime}
-#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.o    # File name for standard output
-#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/subpy.bash.e     # File name for standard error output
+#SBATCH --output=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.o    # File name for standard output
+#SBATCH --error=${DATAOUT}/${YYYYMMDDHHi}/logs/sub_sanity_check.bash.e     # File name for standard error output
 #SBATCH --exclusive
 
 
@@ -131,11 +131,12 @@ export I_MPI_DEBUG=5
 # 
 #
 
-python ${SCRIPTS}/gera_figs.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
+python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
 EOSH
 # Submit the products scripts
-chmod a+x ${SCRIPTS}/sub_py.bash
-sbatch --wait ${SCRIPTS}/sub_py.bash
+chmod a+x ${SCRIPTS}/sub_sanity_check.bash
+sbatch --wait ${SCRIPTS}/sub_sanity_check.bash
+mv ${SCRIPTS}/sub_sanity_check.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
 
 
 
