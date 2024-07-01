@@ -70,6 +70,7 @@ mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/compare
 
 
 # Check all input files before
+flag=0
 files_needed=("${DIR_SCRIPTS_CDCT_ESTABLE}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc" "${DIR_SCRIPTS_CDCT_DEV}/dataout/${YYYYMMDDHHi}/Post/MONAN_DIAG_G_POS_${EXP}_${YYYYMMDDHHi}.00.00.x${RES}L55.nc")
 for file in "${files_needed[@]}"
 do
@@ -77,7 +78,8 @@ do
   then
     echo -e  "\n${RED}==>${NC} ***** ATTENTION *****\n"	  
     echo -e  "${RED}==>${NC} [${0}] At least the file ${file} was not generated. \n"
-    exit -1
+    #exit 16
+    flag=1
   fi
 done
 
@@ -135,14 +137,19 @@ export I_MPI_DEBUG=5
 # 
 #
 
-echo "./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}"
+echo "./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}/compare"
 ./${executable} -n1 ${file_stable} -n2 ${file_dev} -p -o ${DATAOUT}/${YYYYMMDDHHi}/compare
 
 
 EOSH
 
 # Submit the products scripts
-chmod a+x ${SCRIPTS}/sub_compare_dev_stable.bash
-sbatch --wait ${SCRIPTS}/sub_compare_dev_stable.bash
-mv ${SCRIPTS}/sub_compare_dev_stable.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
+if [ ${flag} -eq 0 ]
+then
+   chmod a+x ${SCRIPTS}/sub_compare_dev_stable.bash
+   sbatch --wait ${SCRIPTS}/sub_compare_dev_stable.bash
+   mv ${SCRIPTS}/sub_compare_dev_stable.bash ${DATAOUT}/${YYYYMMDDHHi}/logs/
+else
+   echo -e  "${RED}==>${NC} [${0}] At least one input file was not generated. \n"
+fi
 
