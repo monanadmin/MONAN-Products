@@ -97,6 +97,7 @@ def CompareNetcdfs( NetCDF1,NetCDF2,ToPlot,OutDir ):
     Var1 = Var
     Var2 = Var
     if Var1 not in CommonVariableKeys or Var2 not in CommonVariableKeys:
+      print(f"Var1 not in CommonVariableKeys or Var2 not in CommonVariableKeys. Var = {Var}")
       continue
 
     # ---------------------------------------------
@@ -144,6 +145,7 @@ def CompareNetcdfs( NetCDF1,NetCDF2,ToPlot,OutDir ):
     # has zero elements
     # ------------------------------------------
     if NetCDF_array1.size == 0 or NetCDF_array2.size == 0:
+      print(f"NetCDF_array1.size == 0 or NetCDF_array2.size == 0.  Var = {Var}")
       continue
 
     # -----------------------------------------------
@@ -151,6 +153,7 @@ def CompareNetcdfs( NetCDF1,NetCDF2,ToPlot,OutDir ):
     # then move on
     # -----------------------------------------------
     if NetCDF_array1.size!=NetCDF_array2.size:
+      print(f"NetCDF_array1.size!=NetCDF_array2.size. Var = {Var}")
       continue
 
     # ----------------------------------------------------
