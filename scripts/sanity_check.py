@@ -207,10 +207,15 @@ end_time = time.time()
 elapsed_time = end_time - start_time
 print("Elapsed time reading: ", elapsed_time) 
 
+print(f"Latitudes interval: {latitude.min()} {latitude.max()}")
+print(f"Longitudes interval: {longitude.min()} {longitude.max()}")
+
 # Creating a global map information
+#   Rounding max and min lat and lon to the nearest integer, because could be a little greater 
+#   than the maximum and minimum accepted by Basemap (-90, 90, 0, 360)
 m = Basemap(projection='cyl', resolution='i',
-        llcrnrlat=latitude.min(), urcrnrlat=latitude.max(),
-        llcrnrlon=longitude.min(), urcrnrlon=longitude.max(), lat_0=0.0,lon_0=0.0)
+        llcrnrlat=round(latitude.min()), urcrnrlat=round(latitude.max()),
+        llcrnrlon=round(longitude.min()), urcrnrlon=round(longitude.max()), lat_0=0.0,lon_0=0.0)
 
 makegrid(m)
 # Transforma a grade para as coordenadas do Basemap
