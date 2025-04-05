@@ -15,7 +15,7 @@
 #
 #-----------------------------------------------------------------------------#
 
-if [ $# -ne 4 ]
+if [ $# -ne 5 ]
 then
    echo ""
    echo "Instructions: execute the command below"
@@ -65,7 +65,7 @@ FCST=${4};        #FCST=6
 
 
 # Local variables--------------------------------------
-DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
+DIR_SCRIPTS_CDCT_ESTABLE=${5}
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
 
@@ -131,7 +131,7 @@ export I_MPI_DEBUG=5
 # 
 #
 
-python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST}
+python ${SCRIPTS}/sanity_check.py --datein ${YYYYMMDDHHi} --suffix .00.00.x${RES}L55 --outdir ${DATAOUT} --prefix MONAN_DIAG_G_POS_${EXP}_  --mxhour ${FCST} --basedir ${5}/dataout/
 EOSH
 # Submit the products scripts
 chmod a+x ${SCRIPTS}/sub_sanity_check.bash

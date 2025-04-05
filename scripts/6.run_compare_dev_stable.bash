@@ -15,7 +15,7 @@
 #
 #-----------------------------------------------------------------------------#
 
-if [ $# -ne 4 ]
+if [ $# -ne 6 ]
 then
    echo ""
    echo "Instructions: execute the command below"
@@ -62,8 +62,8 @@ FCST=${4};        #FCST=6
 
 
 # Local variables--------------------------------------
-DIR_SCRIPTS_CDCT_ESTABLE=/mnt/beegfs/monan/scripts_CD-CT
-DIR_SCRIPTS_CDCT_DEV=/mnt/beegfs/monan/scripts_CD-CT_dev/scripts_CD-CT
+DIR_SCRIPTS_CDCT_ESTABLE=${5}
+DIR_SCRIPTS_CDCT_DEV=${6}
 #-------------------------------------------------------
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/logs
 mkdir -p ${DATAOUT}/${YYYYMMDDHHi}/compare
