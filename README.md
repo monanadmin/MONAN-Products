@@ -12,7 +12,7 @@ This is a simple Python3 command line program created by Gerasimos Michalitsiano
 
 # History
 
-[Develop] - There is no tagged version yet.
+[0.1.0] - First version of products 5 and 6 (sanity_check and compare_dev_stable).
 
 # Instructions
 
